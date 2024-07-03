@@ -6,11 +6,6 @@ import { CreateUserDto } from './dto/create-user.dto';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Post()
-  create(@Body() user: CreateUserDto) {
-    return this.usersService.createUser(user);
-  }
-
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.usersService.findOneUser(id);
