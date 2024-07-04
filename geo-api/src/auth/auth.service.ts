@@ -32,4 +32,8 @@ export class AuthService {
             throw new UnauthorizedException
         }
     }
+
+    async Logout(): Promise<String>{
+        return 'Logout successfully';
+    }
 }

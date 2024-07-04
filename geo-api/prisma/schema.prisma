@@ -8,22 +8,54 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String  
-  name      String
-  role      Role     @default(USER)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id        String    @id @default(uuid())
   cityId    String
-  city      City     @relation(fields: [cityId], references: [id])
+  email     String    @unique
+  password  String
+  name      String
+  role      Role      @default(USER)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  city      City      @relation(fields: [cityId], references: [id])
+  products  Product[]
 }
 
 model City {
-  id       String   @id @default(uuid())
+  id       String                                @id @default(uuid())
   name     String
-  geom     Bytes   
+  geom     Bytes
   users    User[]
+  products Product[]
+}
+
+model Product {
+  id          String                              @id @default(uuid())
+  category_id Int
+  city_id     String                              
+  state_id    Int
+  user_id     String
+  name        String                              @unique
+  description String
+  price       Int
+  image_url   String
+  sale_point  Bytes
+  sale_radius Int
+  category    Category                            @relation(fields: [category_id], references: [id])
+  city        City                                @relation(fields: [city_id], references: [id])
+  state       State                               @relation(fields: [state_id], references: [id])
+  user        User                                @relation(fields: [user_id], references: [id])
+}
+
+model Category {
+  id       Int       @id @default(autoincrement())
+  name     String
+  products Product[]
+}
+
+model State {
+  id       Int       @id @default(autoincrement())
+  name     String
+  products Product[]
 }
 
 enum Role {

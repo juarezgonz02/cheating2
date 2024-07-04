@@ -18,4 +18,10 @@ export class AuthController {
     signUp(@Body() body: CreateUserDto) {
         return this.authService.SignUp(body);
     }
+
+    @HttpCode(HttpStatus.OK)
+    @Post('logout')
+    logout() {
+        return this.authService.Logout();
+    }
 }

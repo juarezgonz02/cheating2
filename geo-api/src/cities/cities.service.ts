@@ -10,7 +10,7 @@ export class CitiesService {
     const cities = await this.prismaService.$queryRaw`
       SELECT id, name, ST_AsText(geom) as geom FROM "City"
     `;
-    
+
     return cities;
   }
 
