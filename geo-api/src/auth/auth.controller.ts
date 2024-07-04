@@ -24,4 +24,10 @@ export class AuthController {
     logout() {
         return this.authService.Logout();
     }
+
+    @HttpCode(HttpStatus.OK)
+    @Post('forgotPassword')
+    forgotPassword(@Body() body: { email: string }) {
+        return this.authService.ForgotPassword(body.email);
+    }
 }

@@ -3,6 +3,34 @@ import { UsersService } from 'src/users/users.service';
 import { SignInDto } from './dto/sign-in-dto';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { JwtService } from '@nestjs/jwt';
+import * as nodemailer from 'nodemailer';
+
+
+const generateCodeVerification = () => {
+    const code = Math.floor(1000 + Math.random() * 9000);
+    return code.toString();
+}
+
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: 'sybmarketplace@gmail.com',
+        pass: 'ipphardrbiaxnhtp'
+    }
+});
+
+
+const sendEmail = (email: string, code: string) => {
+    const mailOptions = {
+        from: 'sybmarketplace@gmail.com',
+        to: email,
+        subject: 'Recuperación de contraseña',
+        text: `Tu código de verificación es: ${code}`
+    };
+
+    return transporter.sendMail(mailOptions);
+}
+
 
 @Injectable()
 export class AuthService {
@@ -31,6 +59,16 @@ export class AuthService {
         }{
             throw new UnauthorizedException
         }
+    }
+
+    async ForgotPassword(email: string): Promise<String>{
+        const user = await this.usersService.findOneUserByEmail(email);
+        if(!user){
+            throw new UnauthorizedException();
+        }
+        const code = generateCodeVerification();
+        sendEmail(email, code);
+        return 'Code sent successfully';
     }
 
     async Logout(): Promise<String>{

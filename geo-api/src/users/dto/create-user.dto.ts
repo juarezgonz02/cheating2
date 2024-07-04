@@ -16,5 +16,4 @@ export class CreateUserDto {
     @IsString()
     @IsNotEmpty()
     cityId: string;
-
 }
