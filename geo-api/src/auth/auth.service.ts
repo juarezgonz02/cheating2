@@ -85,8 +85,8 @@ export class AuthService {
         if(codeIndex === -1){
             throw new UnauthorizedException();
         }
-        user.password = password;
-        await this.usersService.updatePassword(user.id, user);
+        const newPassword = user.password = password;
+        await this.usersService.updatePassword(user.id, newPassword);
         codeVerification.splice(codeIndex, 1);
         return 'Password restored successfully';
     }

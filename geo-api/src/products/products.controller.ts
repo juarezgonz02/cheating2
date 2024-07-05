@@ -33,7 +33,9 @@ export class ProductsController {
     @Query('long') long: number,
     @Query('radius') radius: number
   ) { 
+
     console.log('Received parameters:', { lat, long, radius });
+    
     return this.productsService.findProductInRadius(lat, long, radius);
   }
 

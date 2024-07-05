@@ -74,11 +74,11 @@ export class UsersService {
     });
   }
 
-  async updatePassword(id: string, user: User) {
+  async updatePassword(id: string, newPassword: string) {
     return this.prismaService.user.update({
       where: { id },
       data: {
-        password: user.password
+        password: newPassword
       }
     });
   }
