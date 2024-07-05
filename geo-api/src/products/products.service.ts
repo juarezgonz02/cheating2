@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { v4 as uuidv4 } from 'uuid';
+import { Product } from '@prisma/client';
 
 
 @Injectable()
@@ -22,7 +23,7 @@ export class ProductsService {
   
   async findAllProducts() {
     const products = await this.prismaService.$queryRaw`
-      SELECT id, category_id, city_id, state_id, user_id, description, price, image_url, ST_GeomFromText(sale_point), sale_radius FROM "Product"
+      SELECT id, category_id, city_id, state_id, user_id, description, price, image_url, ST_AsText(sale_point), sale_radius FROM "Product"
     `;
 
     return products;
@@ -39,5 +40,55 @@ export class ProductsService {
     return this.prismaService.$queryRaw`
       DELETE FROM "Product" WHERE id = ${id}
     `;
+  }
+
+  async findProductInRadius(lat: number, long: number, radius: number) {
+    const point = `POINT(${long} ${lat})`;
+    const radiusInDegrees = radius / 111320; 
+    
+    console.log('Received parameters:', { lat, long, radius }); 
+    console.log('Generated point and radiusInDegrees:', { point, radiusInDegrees });
+  
+    const products = await this.prismaService.$queryRaw<Product[]>`
+      SELECT id, category_id, city_id, state_id, user_id, description, price, image_url, ST_AsText(sale_point) AS sale_point, sale_radius
+      FROM "Product"
+      WHERE ST_DWithin(
+        sale_point, 
+        ST_SetSRID(ST_GeomFromText(${point}), 4326), 
+        ${radiusInDegrees}
+      )
+    `;
+  
+    if (!products.length) {
+      return "No hay productos en el radio proporcionado";
+    }
+    else {
+      return products;
+    }
+  }
+  
+
+  async findProductInRadiusByCategoriaAndName(lat: number, long: number, radius: number, category_id?: number, name?: string) {
+    const point = `POINT(${long} ${lat})`;
+    const radiusInDegrees = radius / 111320;
+
+    const products = await this.prismaService.$queryRaw<Product[]>`
+      SELECT id, category_id, city_id, state_id, user_id, description, price, image_url, ST_AsText(sale_point) AS sale_point, sale_radius
+      FROM "Product"
+      WHERE ST_DWithin(
+        sale_point, 
+        ST_SetSRID(ST_GeomFromText(${point}), 4326), 
+        ${radiusInDegrees}
+      )
+      ${category_id ? `AND category_id = ${category_id}` : ''}
+      ${name ? `AND name ILIKE '%${name}%'` : ''}
+    `;
+
+    if (!products.length) {
+      return "No products found in the radius and category provided";
+    }
+    else {
+      return products;
+    }
   }
 }

@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from '.prisma/client';
+import { RestorePasswordDto } from './dto/restore-password.dto';
 
 @Injectable()
 export class UsersService {
@@ -72,4 +73,14 @@ export class UsersService {
       }
     });
   }
+
+  async updatePassword(id: string, user: User) {
+    return this.prismaService.user.update({
+      where: { id },
+      data: {
+        password: user.password
+      }
+    });
+  }
+
 }

@@ -5,7 +5,6 @@ import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { JwtService } from '@nestjs/jwt';
 import * as nodemailer from 'nodemailer';
 
-
 const generateCodeVerification = () => {
     const code = Math.floor(1000 + Math.random() * 9000);
     return code.toString();
@@ -31,6 +30,7 @@ const sendEmail = (email: string, code: string) => {
     return transporter.sendMail(mailOptions);
 }
 
+const codeVerification = [];
 
 @Injectable()
 export class AuthService {
@@ -67,6 +67,7 @@ export class AuthService {
             throw new UnauthorizedException();
         }
         const code = generateCodeVerification();
+        codeVerification.push({ email, code });
         sendEmail(email, code);
         return 'Code sent successfully';
     }
@@ -74,4 +75,20 @@ export class AuthService {
     async Logout(): Promise<String>{
         return 'Logout successfully';
     }
+
+    async restorePassword(email: string, code: string, password: string): Promise<String>{
+        const user = await this.usersService.findOneUserByEmail(email);
+        if(!user){
+            throw new UnauthorizedException();
+        }
+        const codeIndex = codeVerification.findIndex(c => c.email === email && c.code === code);
+        if(codeIndex === -1){
+            throw new UnauthorizedException();
+        }
+        user.password = password;
+        await this.usersService.updatePassword(user.id, user);
+        codeVerification.splice(codeIndex, 1);
+        return 'Password restored successfully';
+    }
+
 }

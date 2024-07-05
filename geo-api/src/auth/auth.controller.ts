@@ -30,4 +30,10 @@ export class AuthController {
     forgotPassword(@Body() body: { email: string }) {
         return this.authService.ForgotPassword(body.email);
     }
+
+    @HttpCode(HttpStatus.OK)
+    @Post('restorePassword')
+    restorePassword(@Body() body: { email: string, code: string, newPassword: string }) {
+        return this.authService.restorePassword(body.email, body.code, body.newPassword);
+    }
 }
