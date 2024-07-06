@@ -13,10 +13,6 @@ export class CreateProductDto {
     @IsNotEmpty()
     state_id: number;
 
-    @IsUUID()
-    @IsNotEmpty()
-    user_id: string;
-
     @IsString()
     @IsNotEmpty()
     name: string;
