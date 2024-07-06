@@ -1,4 +1,4 @@
-import { Controller, Get, Param, UseGuards, Req, Delete } from '@nestjs/common';
+import { Controller, Get, Param, UseGuards, Req, Delete, Patch } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { AuthGuard } from 'src/auth/auth.guard';
 
@@ -26,4 +26,5 @@ export class UsersController {
     const role = req.user.role;
     return this.usersService.deleteUser(id, role);
   }
+
 }
