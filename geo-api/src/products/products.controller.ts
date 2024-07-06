@@ -24,32 +24,35 @@ export class ProductsController {
     return this.productsService.createProduct(createProductDto, userId);
   }
 
+  @UseGuards(AuthGuard)
   @Get()
   findAll() {
     return this.productsService.findAllProducts();
   }
 
+  @UseGuards(AuthGuard)
   @Get('/id/:id')
   findOne(@Param('id') id: string) {
     return this.productsService.findOneProduct(id);
   }
 
+  @UseGuards(AuthGuard)
   @Delete('/id/:id')
   remove(@Param('id') id: string) {
     return this.productsService.deleteProduct(id);
   }
 
+  @UseGuards(AuthGuard)
   @Get('/findProductInRadius')
   findProductInRadius(
     @Query('lat') lat: number,
     @Query('long') long: number,
     @Query('radius') radius: number,
   ) {
-    console.log('Received parameters:', { lat, long, radius });
-
     return this.productsService.findProductInRadius(lat, long, radius);
   }
 
+  @UseGuards(AuthGuard)
   @Get('/findProductInRadiusByCategoriaAndName')
   findProductInRadiusByCategoriaAndName(
     @Query('lat') lat: number,

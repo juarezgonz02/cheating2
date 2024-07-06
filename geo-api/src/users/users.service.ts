@@ -15,8 +15,13 @@ export class UsersService {
         }
     });
   }
+  
+  // This metodo only can be used by the ADMIN
+  async findOneUser(id: string, role: string): Promise<User | null> {
+    if (role !== 'ADMIN') {
+      throw new Error('You are not authorized to perform this action');
+    }
 
-  async findOneUser(id: string): Promise<User | null> {
     return this.prismaService.$queryRaw<User[]>`
       SELECT 
         u.id, 
@@ -41,7 +46,11 @@ export class UsersService {
     `[0];
   }
 
-  async findAllUsers(): Promise<User[]> {
+  // This metodo only can be used by the ADMIN
+  async findAllUsers(role: string): Promise<User[]> {
+    if (role !== 'ADMIN') {
+      throw new Error('You are not authorized to perform this action');
+    }
     const users = await this.prismaService.$queryRaw<User[]>`
       SELECT 
         u.id, 
@@ -79,6 +88,18 @@ export class UsersService {
       where: { id },
       data: {
         password: newPassword
+      }
+    });
+  }
+
+  // This metodo only can be used by the ADMIN
+  async deleteUser(id: string, role: string) {
+    if (role !== 'ADMIN') {
+      throw new Error('You are not authorized to perform this action');
+    }
+    return this.prismaService.user.delete({
+      where: {
+        id
       }
     });
   }
