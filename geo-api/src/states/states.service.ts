@@ -1,15 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { State } from '.prisma/client';
 
 @Injectable()
 export class StatesService {
-  constructor(private prismaService:PrismaService) {}
+  constructor(private prismaService: PrismaService) { }
 
   async findAllStates() {
-    const states = await this.prismaService.$queryRaw<State[]>`
-      SELECT
-        s.id,
+    const states = await this.prismaService.state.findMany();
+    return states;
+  }
+
+  async findOneState(id: number) {
+    const state = await this.prismaService.$queryRaw`
+      SELECT 
+        s.id, 
         s.name,
         json_agg(json_build_object(
           'id', p.id,
@@ -25,15 +29,8 @@ export class StatesService {
         )) AS products
       FROM "State" s
       LEFT JOIN "Product" p ON s.id = p.state_id
-      GROUP BY s.id
-    `;
-
-    return states;
-  }
-
-  async findOneState(id: number) {
-    const state = await this.prismaService.$queryRaw`
-      SELECT id, name FROM "State" WHERE id = ${id}
+      WHERE s.id = ${id}
+      GROUP BY s.id;
     `;
     return state[0];
   }

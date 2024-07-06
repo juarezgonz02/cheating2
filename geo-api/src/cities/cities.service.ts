@@ -7,10 +7,13 @@ export class CitiesService {
   constructor(private prismaService: PrismaService) {}
 
   async findAll() {
-    const cities = await this.prismaService.$queryRaw`
-      SELECT id, name, ST_AsText(geom) as geom FROM "City"
-    `;
-
+    const cities = await this.prismaService.city.findMany({
+      select: {
+        id: true,
+        name: true,
+        geom: false,
+      },
+    });
     return cities;
   }
 

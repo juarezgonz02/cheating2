@@ -16,17 +16,22 @@ export class ProductsService {
     const point = `POINT(${long} ${lat})`;
     const id = uuidv4();
 
-    return await this.prismaService.$executeRaw`
+    const newProduct = await this.prismaService.$executeRaw`
       INSERT INTO "Product" (id, category_id, city_id, state_id, user_id, name, description, price, image_url, sale_point, sale_radius)
       VALUES (${id}, ${category_id}, ${city_id}, ${state_id}, ${userId}, ${name}, ${description}, ${price}, ${image_url}, ST_GeomFromText(${point}, 4326), ${sale_radius})
     `;
+
+    if (!newProduct) {
+      throw new Error('Error creating product');
+    }
+
+    return newProduct;
   }
   
   async findAllProducts() {
     const products = await this.prismaService.$queryRaw`
       SELECT id, category_id, city_id, state_id, user_id, description, price, image_url, ST_AsText(sale_point), sale_radius FROM "Product"
     `;
-
     return products;
   }
 
@@ -37,19 +42,10 @@ export class ProductsService {
     return product[0];
   }
 
-  async deleteProduct(id: string) {
-    return this.prismaService.$queryRaw`
-      DELETE FROM "Product" WHERE id = ${id}
-    `;
-  }
-
   async findProductInRadius(lat: number, long: number, radius: number) {
     const point = `POINT(${long} ${lat})`;
     const radiusInDegrees = radius / 111320; 
     
-    console.log('Received parameters:', { lat, long, radius }); 
-    console.log('Generated point and radiusInDegrees:', { point, radiusInDegrees });
-  
     const products = await this.prismaService.$queryRaw<Product[]>`
       SELECT id, category_id, city_id, state_id, user_id, description, price, image_url, ST_AsText(sale_point) AS sale_point, sale_radius
       FROM "Product"
@@ -69,13 +65,9 @@ export class ProductsService {
   }
   
   
-
   async findProductInRadiusByCategoriaAndName(lat: number, long: number, radius: number, category_id?: number, name?: string) {
     const point = `POINT(${long} ${lat})`;
     const radiusInDegrees = radius / 111320; 
-
-    console.log('Received parameters:', { lat, long, radius, category_id, name }); 
-    console.log('Generated point and radiusInDegrees:', { point, radiusInDegrees });
 
     let query = Prisma.sql`
       SELECT id, category_id, city_id, state_id, user_id, name, description, price, image_url, ST_AsText(sale_point) AS sale_point, sale_radius
@@ -101,5 +93,16 @@ export class ProductsService {
     } else {
       return products;
     }
+  }
+
+  // This metodo only can be used by the ADMIN
+  async deleteProduct(id: string, role: string) {
+    if (role !== 'ADMIN') {
+      throw new Error('You are not authorized to perform this action');
+    }
+    
+    return this.prismaService.$queryRaw`
+      DELETE FROM "Product" WHERE id = ${id}
+    `;
   }
 }

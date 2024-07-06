@@ -47,13 +47,11 @@ export class AuthService {
         const user = await this.usersService.findOneUserByEmail(signIn.email);
 
         if (!user) {
-            const message = 'User not found';
-            throw new UnauthorizedException(message);
+            throw new Error('User not found');
         }
 
         if (user?.password && !(await bcrypt.compare(signIn.password, user.password))) {
-            const message = 'Invalid password';
-            throw new UnauthorizedException(message);
+            throw new Error('Invalid password');
         }
         
         const payload = { email: user.email, sub: user.id, role: user.role };
@@ -70,8 +68,7 @@ export class AuthService {
     async SignUp(user: CreateUserDto): Promise<String>{
         const userExist = await this.usersService.findOneUserByEmail(user.email);
         if(userExist){
-            const message = 'User already exists';
-            throw new UnauthorizedException(message);
+            throw new Error('User already exists');
         }
 
         const salt = await bcrypt.genSalt(10);
@@ -81,16 +78,14 @@ export class AuthService {
         if(newUser){
             return 'User created successfully';
         }{
-            const message = 'Error creating user';
-            throw new UnauthorizedException(message);
+            throw new Error('Error creating user');
         }
     }
 
     async ForgotPassword(email: string): Promise<String>{
         const user = await this.usersService.findOneUserByEmail(email);
         if(!user){
-            const message = 'This email is not registered';
-            throw new UnauthorizedException(message);
+            throw new Error('This email is not registered');
         }
         const code = generateCodeVerification();
         codeVerification.push({ email, code });
@@ -101,13 +96,11 @@ export class AuthService {
     async restorePassword(email: string, code: string, password: string): Promise<String> {
         const user = await this.usersService.findOneUserByEmail(email);
         if (!user) {
-            const message = 'This email is not registered';
-            throw new UnauthorizedException(message);
+            throw new Error('This email is not registered');
         }
         const codeIndex = codeVerification.findIndex(c => c.email === email && c.code === code);
         if (codeIndex === -1) {
-            const message = 'Invalid code';
-            throw new UnauthorizedException(message);
+            throw new Error('Invalid code');
         }
     
         const saltRounds = 10; 
