@@ -55,7 +55,7 @@ export class AuthService {
     async SignUp(user: CreateUserDto): Promise<String>{
         const newUser = await this.usersService.createUser(user);
         if(newUser){
-            return 'User created successfully';
+            return JSON.stringify({ message: 'User created successfully'});
         }{
             throw new UnauthorizedException
         }

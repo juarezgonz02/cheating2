@@ -70,9 +70,10 @@ export class ProductsService {
   
   
 
-  async findProductInRadiusByCategoriaAndName(lat: number, long: number, radius: number, category_id?: number, name?: string) {
+  async findProductInRadiusByCategoriaAndName(lat: number, long: number, radius: number, category_id?: string, name?: string) {
     const point = `POINT(${long} ${lat})`;
     const radiusInDegrees = radius / 111320; 
+    const like_name = `%${name}%`
 
     console.log('Received parameters:', { lat, long, radius, category_id, name }); 
     console.log('Generated point and radiusInDegrees:', { point, radiusInDegrees });
@@ -87,17 +88,19 @@ export class ProductsService {
       )
     `;
 
+
     if (category_id !== undefined) {
-        query = Prisma.sql`${query} AND category_id = ${category_id}`;
+        const category_id_number = parseInt(category_id);
+        query = Prisma.sql`${query} AND category_id = ${category_id_number}`;
     }
     if (name !== undefined) {
-        query = Prisma.sql`${query} AND name = ${name}`;
+        query = Prisma.sql`${query} AND name like ${like_name}`;
     }
 
     const products = await this.prismaService.$queryRaw<Product[]>(query);
   
     if (!products.length) {
-      return "No hay productos en el radio proporcionado";
+      return [];
     } else {
       return products;
     }
