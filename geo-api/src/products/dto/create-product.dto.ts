@@ -1,17 +1,21 @@
-import { IsString, IsNumber, IsNotEmpty, IsUUID, IsUrl } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 export class CreateProductDto {
-    @IsNumber()
+    @IsString()
     @IsNotEmpty()
-    category_id: number;
+    category_id: string;
 
-    @IsUUID()
+    @IsString()
     @IsNotEmpty()
     city_id: string;
 
-    @IsNumber()
+    @IsString()
     @IsNotEmpty()
-    state_id: number;
+    state_id: string;
+
+    @IsString()
+    @IsNotEmpty()
+    description: string;
 
     @IsString()
     @IsNotEmpty()
@@ -19,26 +23,17 @@ export class CreateProductDto {
 
     @IsString()
     @IsNotEmpty()
-    description: string;
+    price: string;
 
-    @IsNumber()
+    @IsString()
     @IsNotEmpty()
-    price: number;
+    sale_radius: string;
 
-    @IsUrl()
+    @IsString()
     @IsNotEmpty()
-    image_url: string;
+    lat: string;
 
-    @IsNumber()
+    @IsString()
     @IsNotEmpty()
-    sale_radius: number;
-
-    @IsNumber()
-    @IsNotEmpty()
-    lat: number;
-
-    @IsNumber()
-    @IsNotEmpty()
-    long: number;
-
+    long: string;
 }
