@@ -20,15 +20,15 @@ export class UsersController {
   }
 
   @UseGuards(AuthGuard)
-  @Get(':id')
+  @Get('products')
   @ApiOperation({ summary: 'Obtener un usuario por ID' })
   @ApiParam({ name: 'id', description: 'ID del usuario', type: String })
   @ApiResponse({ status: 200, description: 'Usuario devuelto exitosamente.' })
   @ApiResponse({ status: 403, description: 'Prohibido.' })
   @ApiResponse({ status: 404, description: 'Usuario no encontrado.' })
-  findOne(@Param('id') id: string, @Req() req){
-    const role = req.user.role;
-    return this.usersService.findOneUser(id, role);
+  findOne(@Req() req){
+    const id = req.user.sub
+    return this.usersService.findOneUser(id);
   }
 
   @UseGuards(AuthGuard)

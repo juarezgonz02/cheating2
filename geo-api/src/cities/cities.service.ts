@@ -13,13 +13,16 @@ export class CitiesService {
         name: true,
         geom: false,
       },
+      orderBy: {
+        name: 'asc'
+      }
     });
     return cities;
   }
 
   async findOne(id: string) {
     const city = await this.prismaService.$queryRaw`
-      SELECT id, name, ST_AsText(geom) as geom FROM "City" WHERE id = ${id}
+      SELECT id, name, ST_AsText(geom) as geom FROM "City" WHERE id = ${id} 
     `;
 
     return city;

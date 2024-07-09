@@ -27,6 +27,10 @@ export class CreateProductDto {
 
     @IsString()
     @IsNotEmpty()
+    phone: string;
+
+    @IsString()
+    @IsNotEmpty()
     sale_radius: string;
 
     @IsString()

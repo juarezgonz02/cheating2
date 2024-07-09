@@ -5,6 +5,7 @@ export class ConvertedProductDto {
     description: string;
     name: string;
     price: number;
+    phone: number;
     sale_radius: number;
     lat: number;
     long: number;

@@ -11,19 +11,19 @@ export class ProductsService {
   constructor(private prismaService: PrismaService) {}
 
   async createProduct(createProductDto: ConvertedProductDto, userId: string, imagePath: string) {
-    const { category_id, city_id, state_id, name, description, price, sale_radius, lat, long } = createProductDto;
-    const point = `POINT(${long} ${lat})`;
+    const { category_id, city_id, state_id, name, description, price, phone, sale_radius, lat, long } = createProductDto;
+    const point = `POINT(${lat} ${long})`;
     const id = uuidv4();
 
     const newProduct = await this.prismaService.$executeRaw`
-      INSERT INTO "Product" (id, category_id, city_id, state_id, user_id, name, description, price, image_url, sale_point, sale_radius)
-      VALUES (${id}, ${category_id}, ${city_id}, ${state_id}, ${userId}, ${name}, ${description}, ${price}, ${imagePath}, ST_GeomFromText(${point}, 4326), ${sale_radius})
+      INSERT INTO "Product" (id, category_id, city_id, state_id, phone, user_id, name, description, price, image_url, sale_point, sale_radius)
+      VALUES (${id}, ${category_id}, ${city_id}, ${state_id}, ${phone}, ${userId}, ${name}, ${description}, ${price}, ${imagePath}, ST_GeomFromText(${point}, 4326), ${sale_radius})
     `;
 
     if (!newProduct) {
       throw new Error('Error creating product');
     } else {
-      return "Product created successfully";
+      return JSON.stringify({message: "Product created successfully"});
     }
   }
   
@@ -42,11 +42,11 @@ export class ProductsService {
   }
 
   async findProductInRadius(lat: number, long: number, radius: number) {
-    const point = `POINT(${long} ${lat})`;
+    const point = `POINT(${lat} ${long})`;
     const radiusInDegrees = radius / 111320; 
     
     const products = await this.prismaService.$queryRaw<Product[]>`
-      SELECT id, category_id, city_id, state_id, user_id, description, price, image_url, ST_AsText(sale_point) AS sale_point, sale_radius
+      SELECT id, category_id, city_id, state_id, user_id, description, price, phone, image_url, ST_AsText(sale_point) AS sale_point, sale_radius
       FROM "Product"
       WHERE ST_DWithin(
         sale_point, 
@@ -66,12 +66,14 @@ export class ProductsService {
   
 
   async findProductInRadiusByCategoriaAndName(lat: number, long: number, radius: number, category_id?: string, name?: string) {
-    const point = `POINT(${long} ${lat})`;
+    const point = `POINT(${lat} ${long})`;
     const radiusInDegrees = radius / 111320; 
     const like_name = `%${name}%`
 
+    
+
     let query = Prisma.sql`
-      SELECT id, category_id, city_id, state_id, user_id, name, description, price, image_url, ST_AsText(sale_point) AS sale_point, sale_radius
+      SELECT id, category_id, city_id, state_id, user_id, name, description, phone, price, image_url, ST_AsText(sale_point) AS sale_point, sale_radius
       FROM "Product"
       WHERE ST_DWithin(
         sale_point, 
@@ -81,11 +83,13 @@ export class ProductsService {
     `;
 
 
-    if (category_id !== undefined) {
+    if (category_id !== undefined && category_id !== "") {
         const category_id_number = parseInt(category_id);
+        console.log(category_id)
         query = Prisma.sql`${query} AND category_id = ${category_id_number}`;
-    }
-    if (name !== undefined) {
+      }
+      if (name !== undefined && name !== "") {
+        console.log(name)
         query = Prisma.sql`${query} AND name like ${like_name}`;
     }
 

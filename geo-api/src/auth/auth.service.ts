@@ -90,7 +90,7 @@ export class AuthService {
         const code = generateCodeVerification();
         codeVerification.push({ email, code });
         sendEmail(email, code);
-        return 'Code sent successfully';
+        return JSON.stringify({message: 'Code sent successfully'});
     }
 
     async restorePassword(email: string, code: string, password: string): Promise<String> {
@@ -107,6 +107,6 @@ export class AuthService {
         const hashedPassword = await bcrypt.hash(password, saltRounds);
         await this.usersService.updatePassword(user.id, hashedPassword);
         codeVerification.splice(codeIndex, 1);
-        return 'Password restored successfully';
+        return JSON.stringify({message: 'Code sent successfully'});
     }
 }

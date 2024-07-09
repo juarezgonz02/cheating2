@@ -44,6 +44,7 @@ export class ProductsController {
       sale_radius: { type: 'string' },
       lat: { type: 'string' },
       long: { type: 'string' },
+      phone: {type: 'string'},
       image: {
         type: 'string',
         format: 'binary',
@@ -59,6 +60,8 @@ async createProduct(
   @UploadedFile() file: Express.Multer.File,
   @Req() req
 ) {
+  
+  console.log(createProductDto)
   const userId = req.user.sub;
   const imagePath = file.path;
 
@@ -70,6 +73,7 @@ async createProduct(
     description: createProductDto.description,
     name: createProductDto.name,
     price: parseFloat(createProductDto.price),
+    phone: parseInt(createProductDto.phone),
     sale_radius: parseInt(createProductDto.sale_radius, 10),
     lat: parseFloat(createProductDto.lat),
     long: parseFloat(createProductDto.long),
@@ -143,6 +147,8 @@ async createProduct(
     @Query('category_id') category_id: string,
     @Query('name') name: string,
   ) {
+
+    console.log(`${lat}: number, ${long}: number, ${radius}: number, ${category_id}?: string, ${name}?: string`)
 
     return this.productsService.findProductInRadiusByCategoriaAndName(
       lat,

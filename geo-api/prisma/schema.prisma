@@ -37,6 +37,7 @@ model Product {
   name        String                              @unique
   description String
   price       Int
+  phone       Int
   image_url   String
   sale_point  Bytes
   sale_radius Int
